@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logo Maker</title>
+    <meta name="description" content="AI Icon Generator">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Brush">
+    <title>Brush - AI Icon Generator</title>
+    <link rel="icon" type="image/svg+xml" href="/public/meta/logo.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/public/meta/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/public/meta/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="/public/meta/apple-touch-icon.png">
+    <link rel="manifest" href="/public/meta/manifest.json">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="/src/style.css">
 </head>
@@ -34,5 +44,16 @@
         <div id="toolbar" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg"></div>
     </div>
     <script type="module" src="/src/main.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registered:', registration);
+                }).catch(error => {
+                    console.log('ServiceWorker registration failed:', error);
+                });
+            });
+        }
+    </script>
 </body>
 </html>

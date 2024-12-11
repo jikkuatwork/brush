@@ -1,0 +1,26 @@
+<svg width="100%" height="100%" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <metadata>
+                    <rdf:rdf xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+                        <rdf:description>
+                            <dc:title>LogoMaker v1</dc:title>
+                            <dc:creator>LogoMaker AI</dc:creator>
+                        </rdf:description>
+                    </rdf:rdf>
+                </metadata>
+                
+                <defs>
+                    <linearGradient id="gradient-1733893753330-2" x1="0%" y1="0%" x2="99.99952049770077%" y2="0.00047950229923543475%">
+                        <stop offset="0%" stop-color="rgba(255, 184, 0, 0.95)"/>
+<stop offset="30%" stop-color="rgba(255, 209, 0, 0.9)"/>
+<stop offset="60%" stop-color="rgba(255, 163, 26, 0.85)"/>
+<stop offset="100%" stop-color="rgba(255, 143, 0, 0.8)"/>
+                    </linearGradient>
+                </defs>
+            
+                <rect width="512" height="512" fill="url(#gradient-1733893753330-2)"/>
+                <g transform="translate(128, 128) scale(0.5, 0.5)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="512" height="512" fill="rgba(255, 255, 255, 0.95)">
+                    <path d="M240-120q-45 0-89-22t-71-58q26 0 53-20.5t27-59.5q0-50 35-85t85-35q50 0 85 35t35 85q0 66-47 113t-113 47Zm0-80q33 0 56.5-23.5T320-280q0-17-11.5-28.5T280-320q-17 0-28.5 11.5T240-280q0 23-5.5 42T220-202q5 2 10 2h10Zm230-160L360-470l358-358q11-11 27.5-11.5T774-828l54 54q12 12 12 28t-12 28L470-360Zm-190 80Z"/>
+                </svg>
+            </g>
+            </svg>
