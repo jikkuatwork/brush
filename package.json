@@ -16,7 +16,7 @@
     "autoprefixer": "^10.4.17",
     "bun": "^1.0.26",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.1",
+    "dotenv": "^16.4.7",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.12"
