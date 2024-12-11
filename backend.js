@@ -120,7 +120,19 @@ const server = serve({
 
     try {
       const body = await req.json()
-      const { description } = body
+      const { description } = body || {}
+      
+      if (!description) {
+        log.request("Error: Missing description")
+        return new Response(JSON.stringify({ error: "Missing description" }), {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders
+          },
+        })
+      }
+
       log.request(
         description.length > 30 ? description.slice(0, 27) + "..." : description
       )
