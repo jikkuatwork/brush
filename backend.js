@@ -49,8 +49,37 @@ const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 };
 
-// Read the prompt template
-const promptTemplate = fs.readFileSync("./prompts/icon-search.md", "utf-8")
+// Read the prompt template with error handling
+let promptTemplate = '';
+try {
+  promptTemplate = fs.readFileSync("./prompts/icon-search.md", "utf-8");
+} catch (error) {
+  console.error("Warning: Could not read prompt template:", error.message);
+  promptTemplate = `
+    I want you to generate an icon design based on the following description. Return a JSON object that follows this structure:
+    {
+      "foreground": "rgba color string", 
+      "background": {
+        "type": "gradient type (linear/radial)",
+        "angle": number (0-360),
+        "stops": [
+          {
+            "color": "rgba color string",
+            "position": number (0-100)
+          }
+        ]
+      },
+      "shape": {
+        "family": "icon family name",
+        "id": "icon identifier"
+      },
+      "shortName": "short display name",
+      "description": "full description"
+    }
+
+    Description: 
+  `;
+}
 
 // Logging setup
 const padDate = () => {
@@ -64,6 +93,7 @@ const padDate = () => {
 const log = {
   request: msg => console.log(`${padDate()} | Request  | ${msg}`),
   response: msg => console.log(`${padDate()} | Response | ${msg}`),
+  error: msg => console.error(`${padDate()} | Error    | ${msg}`)
 }
 
 const PORT = process.env.PORT || 9696
@@ -106,6 +136,18 @@ const server = serve({
         })
       }
 
+      // Check OpenAI API key
+      if (!process.env.OPENAI_API_KEY) {
+        log.error("Missing OpenAI API key");
+        return new Response(JSON.stringify({ error: "API key configuration error" }), {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders
+          },
+        });
+      }
+
       // Combine template with description
       const prompt = promptTemplate + description
 
@@ -137,6 +179,17 @@ const server = serve({
       )
 
       const data = await openaiResponse.json()
+      
+      if (!data.choices || !data.choices[0]?.message?.content) {
+        log.error("Invalid OpenAI response:", JSON.stringify(data));
+        return new Response(JSON.stringify({ error: "Invalid API response" }), {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders
+          },
+        });
+      }
 
       // Parse and return the OpenAI response
       const iconConfig = JSON.parse(data.choices[0].message.content)
@@ -150,8 +203,11 @@ const server = serve({
       })
     } catch (error) {
       console.error("Server Error:", error)
-      log.response(`Error: ${error.message}`)
-      return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+      log.error(error.stack || error.message)
+      return new Response(JSON.stringify({ 
+        error: "Internal Server Error",
+        details: error.message 
+      }), {
         status: 500,
         headers: {
           "Content-Type": "application/json",
