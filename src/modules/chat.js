@@ -1,40 +1,49 @@
+// src/modules/chat.js
 import $ from 'jquery';
 import { createMessageElement } from './ui/messageElement';
 import { generateLogoConfig } from './api/api';
 import { createLogoPreview } from './ui/logoPreview';
+import { showHelp, hideHelp } from './ui/helpBox';
+import { getConfig } from './config';
 
 export function initializeChat() {
+    console.log('Initializing chat...');
     const $messageInput = $('#messageInput');
     const $sendBtn = $('#sendBtn');
     const $messages = $('#messages');
-    
     let isGenerating = false;
+    let $currentHelp = null;
+
+    // Initialize help after a short delay to ensure DOM is ready
+    setTimeout(() => {
+        console.log('Checking help status:', getConfig('showHelp'));
+        if (getConfig('showHelp') !== false) {
+            $currentHelp = showHelp($messages);
+        }
+    }, 300);
 
     async function handleSend() {
         const message = $messageInput.val().trim();
         if (message && !isGenerating) {
             try {
-                // Set loading state
+                if ($currentHelp) {
+                    hideHelp($currentHelp);
+                    $currentHelp = null;
+                }
+
                 isGenerating = true;
-                $messageInput.prop('disabled', true);
-                $sendBtn.prop('disabled', true).addClass('opacity-50');
+                $sendBtn.addClass('opacity-50');
                 
-                // Create message element with loading state
                 const $message = await createMessageElement(message, null, true);
                 $messages.append($message);
                 $messages.scrollTop($messages[0].scrollHeight);
                 
-                // Generate logo configuration using API
                 const logoConfig = await generateLogoConfig(message);
-                
-                // Update message element with the logo
                 const $logoPreview = await createLogoPreview(logoConfig);
                 $message.find('.logo-preview-container').replaceWith($logoPreview);
                 
-                // Clear input
                 $messageInput.val('');
             } catch (error) {
-                // Show error in UI
                 const errorMessage = error.message || 'Failed to generate logo';
                 const $errorElement = $(`
                     <div class="max-w-4xl mx-auto">
@@ -46,10 +55,8 @@ export function initializeChat() {
                 $messages.append($errorElement);
                 $messages.scrollTop($messages[0].scrollHeight);
             } finally {
-                // Reset loading state
                 isGenerating = false;
-                $messageInput.prop('disabled', false);
-                $sendBtn.prop('disabled', false).removeClass('opacity-50');
+                $sendBtn.removeClass('opacity-50');
             }
         }
     }
