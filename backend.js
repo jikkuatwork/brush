@@ -68,10 +68,12 @@ const log = {
   response: msg => console.log(`${padDate()} | Response | ${msg}`),
 }
 
-console.log(`Listening at: :8484\n`)
+const PORT = process.env.PORT || 9696
+
+console.log(`Listening at: :${PORT}\n`)
 
 const server = serve({
-  port: 8484,
+  port: PORT,
   async fetch(req) {
     // Handle CORS
     if (req.method === "OPTIONS") {
