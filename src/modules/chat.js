@@ -4,10 +4,9 @@ import { generateLogoConfig } from './api/api';
 import { createLogoPreview } from './ui/logoPreview';
 import { showHelp, hideHelp } from './ui/helpBox';
 import { getConfig } from './config';
-import { setToolbarState } from './ui/toolbar';
+import { setToolbarState, initializeToolbar } from './ui/toolbar';
 
 export function initializeChat() {
-    console.log('Initializing chat...');
     const $messageInput = $('#messageInput');
     const $sendBtn = $('#sendBtn');
     const $messages = $('#messages');
@@ -15,7 +14,6 @@ export function initializeChat() {
     let $currentHelp = null;
 
     setTimeout(() => {
-        console.log('Checking help status:', getConfig('showHelp'));
         if (getConfig('showHelp') !== false) {
             $currentHelp = showHelp($messages);
         }
@@ -63,16 +61,10 @@ export function initializeChat() {
     $sendBtn.on('click', handleSend);
     
     $messageInput.on('keypress', function(e) {
-        if (e.which === 13 && !isGenerating) {
+        if (e.which === 13 && !isGenerating && !$sendBtn.prop('disabled')) {
             handleSend();
         }
     });
 
-    $messageInput.on('input', function() {
-        const isEmpty = !$(this).val().trim();
-        $sendBtn.prop('disabled', isEmpty);
-    });
-
-    // Initial state
-    $sendBtn.prop('disabled', true);
+    initializeToolbar();
 }

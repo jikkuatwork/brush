@@ -47,6 +47,15 @@ export function createToolbar() {
                 background-color: rgba(255, 184, 0, 0.3);
                 cursor: not-allowed;
                 transform: scale(0.95);
+                opacity: 0.5;
+            }
+
+            .settings-mode #sendBtn {
+                display: none !important;
+            }
+
+            #sendBtn svg {
+                transition: opacity 0.2s ease;
             }
 
             #sendBtn:disabled svg {
@@ -104,7 +113,7 @@ export function createToolbar() {
                         class="w-full border border-gray-300 rounded-full px-4 py-2 focus-ring transition-all duration-200"
                         placeholder="Describe your logo...">
                 </div>
-                <button id="sendBtn" class="flex-none p-2 bg-[#FFB800] text-white rounded-full hover:bg-[#E6A600] active:bg-[#CC9500] transition-all duration-200">
+                <button id="sendBtn" disabled class="flex-none p-2 bg-[#FFB800] text-white rounded-full hover:bg-[#E6A600] active:bg-[#CC9500] transition-all duration-200">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18l9-2zm0 0v-8"></path>
                     </svg>
@@ -120,12 +129,31 @@ export function setToolbarState(isGenerating) {
     const $toolbarButton = $('#toolbarButton');
     
     $messageInput.prop('disabled', isGenerating);
-    $sendBtn.prop('disabled', isGenerating);
     $toolbarButton.prop('disabled', isGenerating);
     
-    if (isGenerating) {
-        $sendBtn.closest('.flex').addClass('sending');
+    if (!isGenerating) {
+        updateSendButtonState();
     } else {
-        $sendBtn.closest('.flex').removeClass('sending');
+        $sendBtn.prop('disabled', true);
+        $sendBtn.closest('.flex').addClass('sending');
     }
+}
+
+export function updateSendButtonState() {
+    const $messageInput = $('#messageInput');
+    const $sendBtn = $('#sendBtn');
+    const isEmpty = !$messageInput.val().trim();
+    
+    $sendBtn.prop('disabled', isEmpty);
+    $sendBtn.closest('.flex').removeClass('sending');
+}
+
+export function initializeToolbar() {
+    const $messageInput = $('#messageInput');
+    
+    $messageInput.on('input', function() {
+        updateSendButtonState();
+    });
+    
+    updateSendButtonState();
 }

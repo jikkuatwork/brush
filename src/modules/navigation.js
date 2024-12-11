@@ -9,9 +9,9 @@ export function initializeNavigation() {
     const $closeIcon = $('#closeIcon');
     const $inputArea = $('#inputArea');
     const $sendBtn = $('#sendBtn');
+    const $toolbar = $('#toolbar');
     const $moreContent = $('#moreContent');
 
-    // Initialize settings content
     $moreContent.append(createSettingsContent());
 
     function showMoreScreen() {
@@ -21,6 +21,7 @@ export function initializeNavigation() {
         $closeIcon.removeClass('scale-0');
         $inputArea.addClass('opacity-0 pointer-events-none');
         $sendBtn.addClass('opacity-0 pointer-events-none');
+        $toolbar.addClass('settings-mode');
     }
 
     function hideMoreScreen() {
@@ -30,6 +31,7 @@ export function initializeNavigation() {
         $closeIcon.addClass('scale-0');
         $inputArea.removeClass('opacity-0 pointer-events-none');
         $sendBtn.removeClass('opacity-0 pointer-events-none');
+        $toolbar.removeClass('settings-mode');
     }
 
     $toolbarButton.on('click', function() {
