@@ -40,7 +40,7 @@ export function createSettingsContent() {
                 <div class="prose prose-sm text-gray-600 max-w-md text-center mb-8">
                     <p class="mb-4">
                         This app is part of <a
-                            href="https://99app.toolbomber.com"
+                            href="https://jikkujose.in/startups/2024/12/11/99.html"
                             target="_blank"
                             rel="noopener noreferrer"
                             class="text-blue-500 hover:text-blue-600 font-medium">
