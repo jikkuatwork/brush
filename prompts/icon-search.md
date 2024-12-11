@@ -1,8 +1,6 @@
 ## Icon Search
 
-Find me a material icon id for the following description:
-
-<TEXT_INPUT_CONTENT>
+Find me a material icon id for the following description provided at the bottom
 
 And provide me the result as JSON in the following format:
 
@@ -44,3 +42,7 @@ Take this as an example
 
 Choose ideal colors and ideal shape in the result.
 Make sure the colors have proper visibility, the shape is to be placed over the background
+
+## Description
+
+
