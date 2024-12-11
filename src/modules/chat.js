@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import { createMessageElement } from './ui/messageElement';
-import { generateLogoConfig } from './api/openai';
+import { generateLogoConfig } from './api/api';
 import { createLogoPreview } from './ui/logoPreview';
 
 export function initializeChat() {
@@ -24,7 +24,7 @@ export function initializeChat() {
                 $messages.append($message);
                 $messages.scrollTop($messages[0].scrollHeight);
                 
-                // Generate logo configuration using OpenAI
+                // Generate logo configuration using API
                 const logoConfig = await generateLogoConfig(message);
                 
                 // Update message element with the logo
@@ -40,11 +40,6 @@ export function initializeChat() {
                     <div class="max-w-4xl mx-auto">
                         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
                             <span class="block sm:inline">${errorMessage}</span>
-                            ${error.message.includes('API key') ? `
-                                <span class="block mt-2 text-sm">
-                                    Please add your OpenAI API key in the settings menu.
-                                </span>
-                            ` : ''}
                         </div>
                     </div>
                 `);
