@@ -2,47 +2,87 @@ import $ from 'jquery';
 
 export function createSettingsContent() {
     const $content = $(`
-        <div class="max-w-4xl mx-auto space-y-6">
-            <div class="bg-white rounded-lg p-6 shadow-sm">
-                <h2 class="text-lg font-semibold mb-4">Theme</h2>
-                <div class="flex gap-4">
-                    <button class="flex-1 p-4 rounded-lg border-2 border-blue-500 bg-white flex items-center justify-center gap-2 hover:bg-gray-50" id="lightTheme">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        <span>Light</span>
-                    </button>
-                    <button class="flex-1 p-4 rounded-lg border-2 border-transparent bg-gray-100 flex items-center justify-center gap-2 hover:bg-gray-200" id="darkTheme">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                        </svg>
-                        <span>Dark</span>
-                    </button>
+        <style>
+            @keyframes spinAndScale {
+                0% { transform: scale(1.5) rotate(0deg); }
+                50% { transform: scale(1.8) rotate(180deg); }
+                100% { transform: scale(1.5) rotate(360deg); }
+            }
+            .spin-animation {
+                animation: spinAndScale 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            }
+            .logo-hover {
+                transition: transform 0.2s ease;
+            }
+            .logo-hover:hover {
+                transform: scale(1.6);
+            }
+        </style>
+        <div class="max-w-4xl mx-auto space-y-6 p-6">
+            <div class="flex flex-col items-center justify-center">
+                <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full shadow-lg mb-6 overflow-hidden flex items-center justify-center cursor-pointer hover:shadow-xl transition-shadow duration-300" id="logoContainer">
+                    <div class="w-full h-full transform scale-150 logo-hover" id="logoWrapper">
+                        <img src="/public/meta/logo.svg" alt="Brush Logo" class="w-full h-full object-cover" />
+                    </div>
                 </div>
-            </div>
+                
+                <h1 class="text-2xl font-bold mb-2">Brush</h1>
+                <span class="text-sm text-gray-500 mb-4">Version 0.2</span>
 
-            <div class="bg-white rounded-lg p-6 shadow-sm">
-                <h2 class="text-lg font-semibold mb-4">Export Settings</h2>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Default Format</label>
-                        <select class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option>SVG</option>
-                            <option>PNG</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Resolution</label>
-                        <select class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option>High (2048px)</option>
-                            <option>Medium (1024px)</option>
-                            <option>Low (512px)</option>
-                        </select>
-                    </div>
+                <div class="prose prose-sm text-gray-600 max-w-md text-center mb-6">
+                    <p class="font-medium text-gray-700">
+                        Create beautiful icons for your apps using AI. Simply describe what you want, 
+                        and watch as Brush generates the perfect icon with thoughtfully chosen colors 
+                        and shapes.
+                    </p>
+                </div>
+                
+                <div class="prose prose-sm text-gray-600 max-w-md text-center mb-8">
+                    <p class="mb-4">
+                        This app is part of <a 
+                            href="https://99app.toolbomber.com" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            class="text-blue-500 hover:text-blue-600 font-medium">
+                            99App
+                        </a> Challenge: where we go from idea to deployed app in just 99 minutes using the best AI tools available.
+                    </p>
+                    
+                    <p>Built by <a 
+                        href="https://twitter.com/jikkujose" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        class="text-blue-500 hover:text-blue-600 font-medium">
+                        @jikkujose
+                    </a></p>
                 </div>
             </div>
         </div>
     `);
+
+    let clickCount = 0;
+    let lastClickTime = 0;
+    const clickCooldown = 1000;
+
+    $content.find('#logoContainer').on('click', function() {
+        const currentTime = Date.now();
+        if (currentTime - lastClickTime < clickCooldown) return;
+        
+        lastClickTime = currentTime;
+        clickCount++;
+        
+        const $logo = $(this).find('#logoWrapper');
+        $logo.removeClass('spin-animation').width();
+        $logo.addClass('spin-animation');
+        
+        if (clickCount === 5) {
+            const colors = ['from-red-500 to-yellow-500', 'from-green-500 to-blue-500', 'from-purple-500 to-pink-500'];
+            const currentGradient = colors[Math.floor(Math.random() * colors.length)];
+            $(this).removeClass('from-blue-500 to-purple-600')
+                  .addClass(currentGradient);
+            clickCount = 0;
+        }
+    });
 
     return $content;
 }

@@ -5,7 +5,7 @@
     "start_url": "https://brush.toolbomber.com",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#ffffff",
+    "theme_color": "#FFB800",
     "orientation": "portrait",
     "icons": [
         {
