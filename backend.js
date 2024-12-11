@@ -1,5 +1,37 @@
+/**
+ * Icon Generation API
+ *
+ * Endpoint: POST /api/generate
+ *
+ * Request:
+ * {
+ *   "description": string    // Description of the icon you want to generate
+ * }
+ *
+ * Response:
+ * {
+ *   "foreground": string,     // RGBA color for the icon
+ *   "background": {
+ *     "type": string,        // gradient type
+ *     "angle": number,       // gradient angle
+ *     "stops": [{
+ *       "color": string,     // RGBA color
+ *       "position": number   // 0-100
+ *     }]
+ *   },
+ *   "shape": {
+ *     "family": string,      // icon family
+ *     "id": string          // icon identifier
+ *   },
+ *   "shortName": string,     // short display name
+ *   "description": string    // full description
+ * }
+ */
+
 import { serve } from "bun"
 import { config } from "dotenv"
+import cors from "cors"
+import fs from "fs"
 
 // Load environment variables
 config()
@@ -10,118 +42,75 @@ const ALLOWED_ORIGINS = [
   "https://brush-api.toolbomber.com",
 ]
 
-// Add timestamp to logs
-const getTimestamp = () => new Date().toISOString()
+const corsMiddleware = cors({
+  origin: origin => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      return origin
+    }
+    return false
+  },
+})
 
-// Logger function
-const log = (type, message, data = null) => {
-  const timestamp = getTimestamp()
-  const logMessage = {
-    timestamp,
-    type,
-    message,
-    ...(data && { data }),
-  }
-  console.log(JSON.stringify(logMessage, null, 2))
+// Read the prompt template
+const promptTemplate = fs.readFileSync("./prompts/icon-search.md", "utf-8")
+
+// Logging setup
+const padDate = () => {
+  const d = new Date()
+  const day = String(d.getDate()).padStart(2, "0")
+  const month = String(d.getMonth() + 1).padStart(2, "0")
+  const year = String(d.getFullYear()).slice(2)
+  return `${day}-${month}-${year}`
 }
 
-// CORS headers function
-const getCorsHeaders = origin => {
-  // Check if the origin is allowed
-  const isAllowedOrigin = !origin || ALLOWED_ORIGINS.includes(origin)
-
-  if (!isAllowedOrigin) {
-    log("cors", `Origin rejected: ${origin}`)
-    return {}
-  }
-
-  log("cors", `Origin allowed: ${origin || "no origin"}`)
-
-  return {
-    "Access-Control-Allow-Origin": origin || "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Access-Control-Max-Age": "86400", // 24 hours
-  }
+const log = {
+  request: msg => console.log(`${padDate()} | Request  | ${msg}`),
+  response: msg => console.log(`${padDate()} | Response | ${msg}`),
 }
+
+console.log(`Listening at: :8484\n`)
 
 const server = serve({
   port: 8484,
   async fetch(req) {
-    const requestId = crypto.randomUUID()
-    const startTime = performance.now()
-
-    log("request", "Incoming request", {
-      id: requestId,
-      method: req.method,
-      url: req.url,
-      headers: Object.fromEntries(req.headers.entries()),
-    })
-
-    const origin = req.headers.get("origin")
-    const corsHeaders = getCorsHeaders(origin)
-
-    // Handle preflight requests
+    // Handle CORS
     if (req.method === "OPTIONS") {
-      log("cors", "OPTIONS request handled", { id: requestId })
       return new Response(null, {
-        status: 204,
-        headers: corsHeaders,
+        headers: corsMiddleware.headers,
       })
     }
 
     // Only allow POST requests to /api/generate
     if (req.method !== "POST" || !req.url.endsWith("/api/generate")) {
-      log("error", "Invalid endpoint or method", {
-        id: requestId,
-        method: req.method,
-        url: req.url,
-      })
-      return new Response("Not Found", {
-        status: 404,
-        headers: corsHeaders,
-      })
+      return new Response("Not Found", { status: 404 })
     }
 
     try {
       const body = await req.json()
-      const { prompt, apiKey } = body
+      const { description } = body
+      log.request(
+        description.length > 30 ? description.slice(0, 27) + "..." : description
+      )
 
-      log("request", "Request body received", {
-        id: requestId,
-        promptLength: prompt?.length,
-        hasApiKey: !!apiKey,
-      })
-
-      if (!prompt || !apiKey) {
-        log("error", "Missing required fields", {
-          id: requestId,
-          missingFields: {
-            prompt: !prompt,
-            apiKey: !apiKey,
-          },
+      if (!description) {
+        log.request("Error: Missing description")
+        return new Response(JSON.stringify({ error: "Missing description" }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
         })
-        return new Response(
-          JSON.stringify({ error: "Missing required fields" }),
-          {
-            status: 400,
-            headers: {
-              "Content-Type": "application/json",
-              ...corsHeaders,
-            },
-          }
-        )
       }
 
+      // Combine template with description
+      const prompt = promptTemplate + description
+
       // Call OpenAI API
-      log("openai", "Calling OpenAI API", { id: requestId })
       const openaiResponse = await fetch(
         "https://api.openai.com/v1/chat/completions",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           },
           body: JSON.stringify({
             model: "gpt-4-turbo-preview",
@@ -143,43 +132,26 @@ const server = serve({
 
       const data = await openaiResponse.json()
 
-      const endTime = performance.now()
-      log("response", "OpenAI API response received", {
-        id: requestId,
-        status: openaiResponse.status,
-        processingTime: `${(endTime - startTime).toFixed(2)}ms`,
-        responseSize: JSON.stringify(data).length,
-      })
-
-      // Return the OpenAI response
-      return new Response(JSON.stringify(data), {
-        status: openaiResponse.status,
+      // Parse and return the OpenAI response
+      const iconConfig = JSON.parse(data.choices[0].message.content)
+      log.response(`shape_id: ${iconConfig.shape.id}`)
+      return new Response(JSON.stringify(iconConfig), {
+        status: 200,
         headers: {
           "Content-Type": "application/json",
-          ...corsHeaders,
+          ...corsMiddleware.headers,
         },
       })
     } catch (error) {
-      log("error", "Server Error", {
-        id: requestId,
-        error: error.message,
-        stack: error.stack,
-      })
-
+      console.error("Server Error:", error)
+      log.response(`Error: ${error.message}`)
       return new Response(JSON.stringify({ error: "Internal Server Error" }), {
         status: 500,
         headers: {
           "Content-Type": "application/json",
-          ...corsHeaders,
+          ...corsMiddleware.headers,
         },
       })
     }
   },
-})
-
-// Log server start
-log("server", "Server started", {
-  port: 8484,
-  allowedOrigins: ALLOWED_ORIGINS,
-  environment: process.env.NODE_ENV || "development",
 })
