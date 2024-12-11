@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base container styles */
+#messages, #moreContent {
+  position: relative;
+  margin-right: 0 !important; /* Prevent browser auto-margin for scrollbar */
+  overflow-y: scroll;
+  scrollbar-gutter: stable; /* Reserves space for scrollbar */
+}
+
+/* Scrollbar styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  right: 0;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+}
+
+/* Hide scrollbar in mobile */
+@media (max-width: 640px) {
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+  
+  * {
+    scrollbar-width: none;
+  }
+  
+  #messages, #moreContent {
+    margin-right: 0 !important;
+    scrollbar-gutter: auto;
+  }
+}
+
+/* Ensure content width is fixed */
+.max-w-4xl {
+  width: 100%;
+  max-width: 56rem; /* 4xl in tailwind */
+  box-sizing: border-box;
+  padding-right: 8px; /* Compensate for scrollbar width */
+}
+
+/* Skeleton loader animation */
+@keyframes shine {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-shine {
+  animation: shine 1.5s infinite;
+}
