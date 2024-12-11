@@ -1,3 +1,4 @@
+// src/modules/ui/toolbar.js
 import $ from 'jquery';
 
 export function createToolbar() {
@@ -5,16 +6,46 @@ export function createToolbar() {
         <style>
             #messageInput::placeholder {
                 color: #9CA3AF;
+                transition: color 0.2s ease;
             }
+            
+            #messageInput:disabled::placeholder {
+                color: #D1D5DB;
+            }
+
+            #messageInput {
+                outline: none !important;
+                transition: all 0.2s ease;
+            }
+
             #messageInput:focus {
                 border-color: #FFB800;
                 box-shadow: 0 0 0 2px rgba(255, 184, 0, 0.2);
             }
-            #messageInput {
-                outline: none !important;
+
+            #messageInput:disabled {
+                background-color: rgba(255, 184, 0, 0.05);
+                color: #6B7280;
+                border-color: rgba(255, 184, 0, 0.2);
             }
+
             .focus-ring {
                 transition: box-shadow 0.15s ease-in-out;
+            }
+
+            #toolbarButton:disabled {
+                background-color: rgba(255, 184, 0, 0.05);
+                color: #9CA3AF;
+                cursor: not-allowed;
+            }
+
+            #sendBtn:disabled {
+                background-color: rgba(255, 184, 0, 0.3);
+                cursor: not-allowed;
+            }
+
+            #sendBtn:disabled svg {
+                opacity: 0.5;
             }
         </style>
         <div class="border-t bg-white p-4 pb-8">
@@ -38,7 +69,7 @@ export function createToolbar() {
                         class="w-full border border-gray-300 rounded-full px-4 py-2 focus-ring transition-all duration-200"
                         placeholder="Describe your logo...">
                 </div>
-                <button id="sendBtn" class="flex-none p-2 bg-[#FFB800] text-white rounded-full hover:bg-[#E6A600] active:bg-[#CC9500] transition-colors duration-200">
+                <button id="sendBtn" class="flex-none p-2 bg-[#FFB800] text-white rounded-full hover:bg-[#E6A600] active:bg-[#CC9500] transition-all duration-200">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                     </svg>
