@@ -30,7 +30,6 @@
 
 import { serve } from "bun"
 import { config } from "dotenv"
-import cors from "cors"
 import fs from "fs"
 
 // Load environment variables
@@ -40,16 +39,15 @@ const ALLOWED_ORIGINS = [
   "http://localhost:8000",
   "http://localhost:5173",
   "https://brush-api.toolbomber.com",
-]
+];
 
-const corsMiddleware = cors({
-  origin: origin => {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
-      return origin
-    }
-    return false
-  },
-})
+// CORS headers configuration
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400',
+};
 
 // Read the prompt template
 const promptTemplate = fs.readFileSync("./prompts/icon-search.md", "utf-8")
@@ -75,16 +73,19 @@ console.log(`Listening at: :${PORT}\n`)
 const server = serve({
   port: PORT,
   async fetch(req) {
-    // Handle CORS
+    // Handle CORS preflight
     if (req.method === "OPTIONS") {
       return new Response(null, {
-        headers: corsMiddleware.headers,
-      })
+        headers: corsHeaders
+      });
     }
 
     // Only allow POST requests to /api/generate
     if (req.method !== "POST" || !req.url.endsWith("/api/generate")) {
-      return new Response("Not Found", { status: 404 })
+      return new Response("Not Found", {
+        status: 404,
+        headers: corsHeaders
+      });
     }
 
     try {
@@ -98,7 +99,10 @@ const server = serve({
         log.request("Error: Missing description")
         return new Response(JSON.stringify({ error: "Missing description" }), {
           status: 400,
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders
+          },
         })
       }
 
@@ -141,7 +145,7 @@ const server = serve({
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          ...corsMiddleware.headers,
+          ...corsHeaders
         },
       })
     } catch (error) {
@@ -151,7 +155,7 @@ const server = serve({
         status: 500,
         headers: {
           "Content-Type": "application/json",
-          ...corsMiddleware.headers,
+          ...corsHeaders
         },
       })
     }
