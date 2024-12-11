@@ -1,3 +1,3 @@
-# brush
+# Bursh
 
-[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/jikkuatwork/brush)
+Simple app for making logos
