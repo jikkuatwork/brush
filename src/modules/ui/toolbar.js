@@ -1,4 +1,3 @@
-// src/modules/ui/toolbar.js
 import $ from 'jquery';
 
 export function createToolbar() {
@@ -27,6 +26,7 @@ export function createToolbar() {
                 background-color: rgba(255, 184, 0, 0.05);
                 color: #6B7280;
                 border-color: rgba(255, 184, 0, 0.2);
+                cursor: not-allowed;
             }
 
             .focus-ring {
@@ -39,13 +39,48 @@ export function createToolbar() {
                 cursor: not-allowed;
             }
 
+            #sendBtn {
+                transition: all 0.2s ease;
+            }
+
             #sendBtn:disabled {
                 background-color: rgba(255, 184, 0, 0.3);
                 cursor: not-allowed;
+                transform: scale(0.95);
             }
 
             #sendBtn:disabled svg {
                 opacity: 0.5;
+            }
+
+            .sending #sendBtn {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .sending #sendBtn::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 200%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent
+                );
+                animation: loading 1.5s infinite;
+            }
+
+            @keyframes loading {
+                0% {
+                    transform: translateX(-100%);
+                }
+                100% {
+                    transform: translateX(100%);
+                }
             }
         </style>
         <div class="border-t bg-white p-4 pb-8">
@@ -71,10 +106,26 @@ export function createToolbar() {
                 </div>
                 <button id="sendBtn" class="flex-none p-2 bg-[#FFB800] text-white rounded-full hover:bg-[#E6A600] active:bg-[#CC9500] transition-all duration-200">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18l9-2zm0 0v-8"></path>
                     </svg>
                 </button>
             </div>
         </div>
     `);
+}
+
+export function setToolbarState(isGenerating) {
+    const $messageInput = $('#messageInput');
+    const $sendBtn = $('#sendBtn');
+    const $toolbarButton = $('#toolbarButton');
+    
+    $messageInput.prop('disabled', isGenerating);
+    $sendBtn.prop('disabled', isGenerating);
+    $toolbarButton.prop('disabled', isGenerating);
+    
+    if (isGenerating) {
+        $sendBtn.closest('.flex').addClass('sending');
+    } else {
+        $sendBtn.closest('.flex').removeClass('sending');
+    }
 }

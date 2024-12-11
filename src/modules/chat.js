@@ -1,10 +1,10 @@
-// src/modules/chat.js
 import $ from 'jquery';
 import { createMessageElement } from './ui/messageElement';
 import { generateLogoConfig } from './api/api';
 import { createLogoPreview } from './ui/logoPreview';
 import { showHelp, hideHelp } from './ui/helpBox';
 import { getConfig } from './config';
+import { setToolbarState } from './ui/toolbar';
 
 export function initializeChat() {
     console.log('Initializing chat...');
@@ -14,7 +14,6 @@ export function initializeChat() {
     let isGenerating = false;
     let $currentHelp = null;
 
-    // Initialize help after a short delay to ensure DOM is ready
     setTimeout(() => {
         console.log('Checking help status:', getConfig('showHelp'));
         if (getConfig('showHelp') !== false) {
@@ -32,7 +31,7 @@ export function initializeChat() {
                 }
 
                 isGenerating = true;
-                $sendBtn.addClass('opacity-50');
+                setToolbarState(true);
                 
                 const $message = await createMessageElement(message, null, true);
                 $messages.append($message);
@@ -53,10 +52,10 @@ export function initializeChat() {
                     </div>
                 `);
                 $messages.append($errorElement);
-                $messages.scrollTop($messages[0].scrollHeight);
             } finally {
                 isGenerating = false;
-                $sendBtn.removeClass('opacity-50');
+                setToolbarState(false);
+                $messages.scrollTop($messages[0].scrollHeight);
             }
         }
     }
@@ -68,4 +67,12 @@ export function initializeChat() {
             handleSend();
         }
     });
+
+    $messageInput.on('input', function() {
+        const isEmpty = !$(this).val().trim();
+        $sendBtn.prop('disabled', isEmpty);
+    });
+
+    // Initial state
+    $sendBtn.prop('disabled', true);
 }
