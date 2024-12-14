@@ -17,6 +17,9 @@ Hosted at GCP, frontend in Vercel
 
 ## Development
 
+
+### Frontend
+
 1. Install dependencies
 
 ```
@@ -28,3 +31,7 @@ bun install
 ```
 bun run dev
 ```
+
+### Backend
+
+Entire backend is one file: `backend.js`
