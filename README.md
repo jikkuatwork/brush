@@ -14,3 +14,17 @@ tools like Bolt & Cursor. [More Info](https://jikkujose.in/startups/2024/12/11/9
 ## API
 
 Hosted at GCP, frontend in Vercel
+
+## Development
+
+1. Install dependencies
+
+```
+bun install
+```
+
+1. Run
+
+```
+bun run dev
+```
